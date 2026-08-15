@@ -35,9 +35,33 @@ class OpenApiGenerationTest {
     @Test
     void 명세에_Greeting_스키마가_들어있다() throws Exception {
         JsonObject spec = new JsonObject(Files.readString(SCHEMA));
-        JsonObject schemas = spec.getJsonObject("components").getJsonObject("schemas");
+        JsonObject components = spec.getJsonObject("components");
+
+        assertNotNull(components, "components가 없습니다");
+        JsonObject schemas = components.getJsonObject("schemas");
 
         assertNotNull(schemas.getJsonObject("Greeting"),
                 "Greeting 스키마가 없습니다. 실제 스키마: " + schemas.fieldNames());
+    }
+
+    @Test
+    void Greeting_스키마에_name과_message_프로퍼티가_들어있다() throws Exception {
+        JsonObject spec = new JsonObject(Files.readString(SCHEMA));
+        JsonObject components = spec.getJsonObject("components");
+
+        assertNotNull(components, "components가 없습니다");
+        JsonObject schemas = components.getJsonObject("schemas");
+
+        JsonObject greeting = schemas.getJsonObject("Greeting");
+        assertNotNull(greeting,
+                "Greeting 스키마가 없습니다. 실제 스키마: " + schemas.fieldNames());
+
+        JsonObject properties = greeting.getJsonObject("properties");
+        assertNotNull(properties,
+                "Greeting 스키마에 properties가 없습니다: " + greeting);
+        assertTrue(properties.containsKey("name"),
+                "Greeting 스키마에 name 프로퍼티가 없습니다. 실제 프로퍼티: " + properties.fieldNames());
+        assertTrue(properties.containsKey("message"),
+                "Greeting 스키마에 message 프로퍼티가 없습니다. 실제 프로퍼티: " + properties.fieldNames());
     }
 }
