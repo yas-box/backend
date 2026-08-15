@@ -1,2 +1,13 @@
+# Gradle
 .gradle/
 build/
+
+# Node (릴리스 도구 전용)
+node_modules/
+
+# IntelliJ
+.idea
+*.iml
+
+# 로컬 환경
+.env

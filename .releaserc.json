@@ -1,0 +1,22 @@
+{
+  "branches": ["main"],
+  "plugins": [
+    "@semantic-release/commit-analyzer",
+    "@semantic-release/release-notes-generator",
+    [
+      "@semantic-release/exec",
+      {
+        "prepareCmd": "./gradlew build -Dquarkus.container-image.push=true -Dquarkus.container-image.tag=${nextRelease.version} -Dquarkus.smallrye-openapi.info-version=${nextRelease.version}",
+        "successCmd": "echo released=true >> $GITHUB_OUTPUT && echo version=${nextRelease.version} >> $GITHUB_OUTPUT"
+      }
+    ],
+    [
+      "@semantic-release/github",
+      {
+        "assets": [
+          { "path": "build/openapi/openapi.json", "label": "OpenAPI specification" }
+        ]
+      }
+    ]
+  ]
+}
