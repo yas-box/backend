@@ -60,6 +60,7 @@ jobs:
 
       - name: docs 저장소 깨우기
         if: steps.semrel.outputs.released == 'true'
+        id: dispatch
         env:
           GH_TOKEN: ${{ steps.apptoken.outputs.token }}
         run: |
@@ -67,11 +68,17 @@ jobs:
             -f event_type=backend-released \
             -F "client_payload[version]=${{ steps.semrel.outputs.version }}"
 
+      # 이슈에 실행 링크만 담으면 "실패했다"만 알 뿐 왜인지 모른다.
+      # 어느 단계에서 깨졌는지가 없으면 매번 사람이 로그를 열어봐야 한다.
       - name: 실패 시 이슈 생성
         if: failure()
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+          SEMREL: ${{ steps.semrel.outcome }}
+          APPTOKEN: ${{ steps.apptoken.outcome }}
+          DISPATCH: ${{ steps.dispatch.outcome }}
         run: |
-          gh issue create \
-            --title "릴리스 실패: ${{ github.sha }}" \
-            --body "워크플로 실행: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+          BODY=$(printf '실행 로그: %s\n\n## 단계별 결과\n\n| 단계 | 결과 |\n|---|---|\n| semantic-release | %s |\n| App 토큰 발급 | %s |\n| docs 저장소 깨우기 | %s |\n\n빈 칸은 그 단계가 실행되지 않았다는 뜻이다.\n`failure`인 단계의 로그를 위 링크에서 확인한다.' \
+            "$RUN_URL" "${SEMREL:-(실행 안 됨)}" "${APPTOKEN:-(실행 안 됨)}" "${DISPATCH:-(실행 안 됨)}")
+          gh issue create --title "릴리스 실패: ${{ github.sha }}" --body "$BODY"
