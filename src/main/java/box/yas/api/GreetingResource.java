@@ -26,4 +26,12 @@ public class GreetingResource {
     public Greeting greet(@PathParam("name") String name) {
         return new Greeting(name, "안녕하세요, " + name + "님");
     }
+
+    /**
+     * 기본 인사말을 돌려준다.
+     */
+    @GET
+    public Greeting greetAnonymous() {
+        return new Greeting("손님", "안녕하세요, 손님님");
+    }
 }
