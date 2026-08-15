@@ -32,6 +32,6 @@ public class GreetingResource {
      */
     @GET
     public Greeting greetAnonymous() {
-        return new Greeting("손님", "안녕하세요, 손님님");
+        return new Greeting("손님", "안녕하세요, 손님");
     }
 }
